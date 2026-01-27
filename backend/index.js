@@ -1,15 +1,14 @@
-const dotenv = require('dotenv');
+const dotenv = require("dotenv");
 // Load env
-dotenv.config({ path: '../.env' });
+dotenv.config({ path: "../.env" });
 
-const express = require('express');
-const mongoose = require('mongoose');
-const bookRoutes = require('./routes/bookRoutes');
-const userRoutes = require('./routes/userRoutes');
-const otpRoutes = require('./routes/otprouters')
+const express = require("express");
+const mongoose = require("mongoose");
+const bookRoutes = require("./routes/bookRoutes");
+const userRoutes = require("./routes/userRoutes");
+const otpRoutes = require("./routes/otprouters");
 
-
-const Book = require('./models/Book');
+const Book = require("./models/Book");
 const cors = require("cors");
 
 const DB_URL = process.env.MONGO_URI;
@@ -20,26 +19,26 @@ app.use(cors());
 app.use(express.json());
 
 // DB connection
-mongoose.connect(DB_URL)
+mongoose
+  .connect(DB_URL)
   .then(() => console.log("DB connected"))
-  .catch(err => console.log(err));
+  .catch((err) => console.log(err));
 
-app.use('/library/book', bookRoutes)
-app.use('/library/user', require("./routes/userRoutes"))
+app.get("/", (req, res) => {
+  res.json({ message: "backend work well" });
+});
+
+app.use("/library/book", bookRoutes);
+app.use("/library/user", require("./routes/userRoutes"));
 app.use("/library/otp", otpRoutes);
-app.use("/library/activity", require('./routes/activityRoutes'));
-
+app.use("/library/activity", require("./routes/activityRoutes"));
 
 // Start Cron Job
-const startCronJob = require('./cronScheduler');
+const startCronJob = require("./cronScheduler");
 startCronJob();
 
+const transporter = require("./config/mailer");
 
-
-const transporter = require('./config/mailer');
-
-app.listen(PORT , ()=>{
-  console.log(`Backend server is runing at ${PORT}`)
-})
-
- 
+app.listen(PORT, () => {
+  console.log(`Backend server is runing at ${PORT}`);
+});
