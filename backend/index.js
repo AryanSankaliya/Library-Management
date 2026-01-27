@@ -38,16 +38,8 @@ startCronJob();
 
 const transporter = require('./config/mailer');
 
-app.listen(PORT, () => {
-  console.log(`Server started at ${PORT}`);
+app.listen(PORT , ()=>{
+  console.log(`Backend server is runing at ${PORT}`)
+})
 
-  // Verify SMTP Connection for Debugging
-
-  transporter.verify((error, success) => {
-    if (error) {
-      console.error("❌ SMTP Connection failed:", error);
-    } else {
-
-    }
-  });
-});
+ 
