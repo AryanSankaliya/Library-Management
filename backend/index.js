@@ -34,23 +34,10 @@ app.use("/library/otp", otpRoutes);
 app.use("/library/activity", require("./routes/activityRoutes"));
 
 // Start Cron Job
-// const startCronJob = require("./cronScheduler");
-// startCronJob();
+const startCronJob = require("./cronScheduler");
+startCronJob();
 
-async function startServer() {
-  try {
-    // Connect to MongoDB
-    await mongoose.connect(DB_URL);
-    console.log("DB connected");
 
-    // Start server AFTER DB connection
-    app.listen(PORT, () => {
-      console.log(`Backend running on PORT ${PORT}`);
-    });
-  } catch (err) {
-    console.error("DB connection failed:", err);
-  }
-}
-
-// Start the server
-startServer();
+app.listen(PORT, () => {
+  console.log(`Backend server is runing at ${PORT}`);
+}); 
