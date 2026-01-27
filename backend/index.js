@@ -12,7 +12,7 @@ const Book = require("./models/Book");
 const cors = require("cors");
 
 const DB_URL = process.env.MONGO_URI;
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 8080;
 
 const app = express();
 app.use(cors());
