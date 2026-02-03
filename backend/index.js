@@ -16,33 +16,28 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🔐 SAFETY CHECK (IMPORTANT)
 if (!DB_URL) {
-  console.error("❌ MONGO_URI missing");
+  console.error(" MONGO_URI missing");
   process.exit(1);
 }
 
 // DB connect
 mongoose
   .connect(DB_URL)
-  .then(() => console.log("✅ DB connected"))
+  .then(() => console.log(" DB connected"))
   .catch((err) => {
-    console.error("❌ DB connection failed", err);
+    console.error(" DB connection failed", err);
     process.exit(1);
   });
 
-app.get("/", (req, res) => {
-  res.json({ message: "backend work well" });
-});
 
 app.use("/library/book", bookRoutes);
 app.use("/library/user", userRoutes);
 app.use("/library/otp", otpRoutes);
 app.use("/library/activity", require("./routes/activityRoutes"));
 
-// ❗ pehle test ke liye cron band rakh
-// const startCronJob = require("./cronScheduler");
-// startCronJob();
+const startCronJob = require("./cronScheduler");
+startCronJob();
 
 app.listen(PORT, () => {
   console.log(`🚀 Backend running on port ${PORT}`);
