@@ -30,6 +30,10 @@ mongoose
     process.exit(1);
   });
 
+app.get('/' , (req , res)=>{
+  res.send("backend work")
+})  
+
 
 app.use("/library/book", bookRoutes);
 app.use("/library/user", userRoutes);
