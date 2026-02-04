@@ -186,7 +186,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
         <GlassCard className="min-h-[300px] flex flex-col items-center justify-center p-6">
           <h3 className="text-xl font-bold text-gray-700 mb-6 self-start">Book Distribution</h3>
-          <div className="w-full h-[250px]">
+          <div className="w-full h-[250px] min-w-full" style={{ width: '100%', height: 250 }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
