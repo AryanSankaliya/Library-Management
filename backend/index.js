@@ -1,5 +1,5 @@
 const dotenv = require("dotenv");
-dotenv.config();
+dotenv.config({ path: "../.env" });
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -30,9 +30,9 @@ mongoose
     process.exit(1);
   });
 
-app.get('/' , (req , res)=>{
+app.get('/', (req, res) => {
   res.send("backend work")
-})  
+})
 
 
 app.use("/library/book", bookRoutes);
@@ -44,5 +44,5 @@ const startCronJob = require("./cronScheduler");
 startCronJob();
 
 app.listen(PORT, () => {
-  console.log(`🚀 Backend running on port ${PORT}`);
+  console.log(` Backend running on port ${PORT}`);
 });
