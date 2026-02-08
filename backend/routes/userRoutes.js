@@ -284,14 +284,24 @@ router.post("/return/:bookId", auth, async (req, res) => {
 ===================================================== */
 router.get("/my-books", auth, async (req, res) => {
   try {
-    // get logged-in user
-    const user = await User.findById(req.user.id).populate(
-      "issuedBooks.bookId"
-    );
+    const user = await User.findById(req.user.id).populate("issuedBooks.bookId");
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Filter out entries where bookId is null (book was deleted)
+    const validIssuedBooks = user.issuedBooks.filter(entry => entry.bookId !== null);
+
+    // If we found invalid/deleted books, update the user record
+    if (validIssuedBooks.length !== user.issuedBooks.length) {
+      user.issuedBooks = validIssuedBooks;
+      await user.save();
+    }
 
     res.status(200).json({
       success: true,
-      data: user.issuedBooks,
+      data: validIssuedBooks,
     });
   } catch (error) {
     res.status(500).json({

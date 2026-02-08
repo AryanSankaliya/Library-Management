@@ -96,6 +96,8 @@ export default function MyBooks() {
                         const book = entry.bookId || {};
                         const bookId = book._id;
 
+                        if (!bookId) return null;
+
                         return (
                             <motion.div variants={item} key={entry._id}>
                                 <GlassCard className="h-full flex flex-col border-t-4 border-t-emerald-500/50">

@@ -165,21 +165,34 @@ router.delete("/by-title", auth, async (req, res) => {
       });
     }
 
-    const deletedBook = await Book.findOneAndDelete({
+
+    // Find the book first
+    const book = await Book.findOne({
       title: { $regex: title, $options: "i" }
     });
 
-    if (!deletedBook) {
+    if (!book) {
       return res.status(404).json({
         success: false,
         message: "Book not found"
       });
     }
 
+    // Check if book is issued
+    if (book.issued) {
+      return res.status(409).json({
+        success: false,
+        message: "Book cannot be deleted because it is currently issued to a student"
+      });
+    }
+
+    // If not issued, proceed to delete
+    await Book.findByIdAndDelete(book._id);
+
     res.status(200).json({
       success: true,
       message: "Book deleted successfully",
-      deleted: deletedBook
+      deleted: book
     });
   } catch (error) {
     res.status(500).json({
