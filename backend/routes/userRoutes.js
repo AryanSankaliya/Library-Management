@@ -110,7 +110,7 @@ router.post("/login", async (req, res) => {
 
     // generate token
     const token = jwt.sign(
-      { id: user._id, role: user.role },
+      { id: user._id, role: user.role, email: user.email },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -140,13 +140,8 @@ router.post("/login", async (req, res) => {
 router.post("/issue/:bookId", auth, async (req, res) => {
   try {
     // find book by id
-    // find book by id
     const rawId = req.params.bookId;
     const cleanId = rawId.trim();
-
-
-
-
 
     let book;
     if (mongoose.Types.ObjectId.isValid(cleanId)) {
@@ -179,8 +174,6 @@ router.post("/issue/:bookId", auth, async (req, res) => {
       });
     }
 
-
-
     // 🔴 FOURTH: Max 3 books limit check
     const currentUser = await User.findById(req.user.id);
     if (currentUser.issuedBooks.length >= 3) {
@@ -212,7 +205,8 @@ router.post("/issue/:bookId", auth, async (req, res) => {
 
 
     // Log Activity
-    await logActivity(req.user.email, 'ISSUE_BOOK', `Issued book: ${book.title}`);
+    // Use currentUser.email since req.user.email might be missing in old tokens
+    await logActivity(currentUser.email, 'ISSUE_BOOK', `Issued book: ${book.title}`);
 
     res.status(200).json({
       success: true,
@@ -237,8 +231,6 @@ router.post("/return/:bookId", auth, async (req, res) => {
     const rawId = req.params.bookId;
     const cleanId = rawId.trim();
 
-
-
     if (!mongoose.Types.ObjectId.isValid(cleanId)) {
       return res.status(400).json({ success: false, message: "Invalid Book ID format" });
     }
@@ -249,21 +241,22 @@ router.post("/return/:bookId", auth, async (req, res) => {
       book.issued = false;
       book.issuedTo = null;
       await book.save();
-    } else {
-      // Even if book not found, we should try to remove it from user's list just in case
     }
 
     // 2. Remove from User's issuedBooks list
     // Use $pull to remove the entry with the matching bookId
-    await User.findByIdAndUpdate(req.user.id, {
+    // Get the updated user to access email for logging
+    const user = await User.findByIdAndUpdate(req.user.id, {
       $pull: { issuedBooks: { bookId: cleanId } },
-    });
+    }, { new: true });
 
     // Log Activity (fetch book title before is tricky if we don't have it, but we can look it up or just use ID. Better to have title)
     let details = `Returned book ID: ${cleanId}`;
     if (book) details = `Returned book: ${book.title}`;
 
-    await logActivity(req.user.email, 'RETURN_BOOK', details);
+    if (user) {
+      await logActivity(user.email, 'RETURN_BOOK', details);
+    }
 
     res.status(200).json({
       success: true,
